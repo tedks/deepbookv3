@@ -1,8 +1,8 @@
 # Bazel package graph
 
-The first child-owned Bazel target is `//scripts:typecheck`. It compiles the 14 existing TypeScript transaction script files using the `scripts/pnpm-lock.yaml` dependency graph and its TypeScript 5.6.2 peer package. The build emits JavaScript but does not execute it; these scripts can read a wallet, invoke the Sui CLI, and submit chain transactions at runtime.
+The first Bazel target is `//scripts:typecheck`. It compiles the 14 existing TypeScript transaction script files using the `scripts/pnpm-lock.yaml` dependency graph and its explicit TypeScript 5.6.2 dependency. The build emits JavaScript but does not execute it; these scripts can read a wallet, invoke the Sui CLI, and submit chain transactions at runtime. Bazel may fetch integrity-pinned dependencies when resolving the module and pnpm lock; no wallet or chain operation is part of this target.
 
-With Bazel 8.7.0 available, build from this repository root:
+The pinned Node toolchain supports Linux x86-64. With Bazel 8.7.0 available on that platform, build from this repository root:
 
 ```bash
 bazel build //scripts:typecheck --jobs=2 --local_resources=memory=2048

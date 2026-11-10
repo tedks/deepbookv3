@@ -11,6 +11,7 @@ build
 
 # Node.js
 node_modules
+/bazel-*
 package-lock.json
 
 # misc

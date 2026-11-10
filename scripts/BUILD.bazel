@@ -28,6 +28,7 @@ ts_project(
         "transactions/unregisterPoolAndCreate.ts",
         "utils/utils.ts",
     ],
+    data = ["package.json"],
     tsconfig = "tsconfig.json",
     out_dir = "dist",
     supports_workers = 0,
@@ -38,5 +39,6 @@ ts_project(
 
 filegroup(
     name = "typecheck",
+    # The compiled output is emitted by tsc, so type errors fail this build.
     srcs = [":compiled"],
 )
