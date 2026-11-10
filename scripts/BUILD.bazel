@@ -1,0 +1,42 @@
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@deepbook_scripts_npm//:defs.bzl", "npm_link_all_packages")
+load("@deepbook_scripts_npm//scripts:typescript/package_json.bzl", typescript_bin = "bin")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["package.json", "pnpm-lock.yaml", "tsconfig.json"])
+
+npm_link_all_packages(name = "node_modules")
+typescript_bin.tsc_binary(name = "child_tsc")
+
+# Compile transaction tooling without executing wallet, Sui CLI or chain calls.
+ts_project(
+    name = "compiled",
+    srcs = [
+        "config/constants.ts",
+        "transactions/createPool.ts",
+        "transactions/deepbookMarketMaker.ts",
+        "transactions/disableVersion.ts",
+        "transactions/enableVersion.ts",
+        "transactions/linkPackageInfo.ts",
+        "transactions/mainPackageUpgrade.ts",
+        "transactions/mvrPrep.ts",
+        "transactions/mvrPrepKiosk.ts",
+        "transactions/mvrPrepKioskRegistration.ts",
+        "transactions/packageInfoCreation.ts",
+        "transactions/transaction.ts",
+        "transactions/unregisterPoolAndCreate.ts",
+        "utils/utils.ts",
+    ],
+    tsconfig = "tsconfig.json",
+    out_dir = "dist",
+    supports_workers = 0,
+    transpiler = "tsc",
+    tsc = ":child_tsc",
+    deps = [":node_modules"],
+)
+
+filegroup(
+    name = "typecheck",
+    srcs = [":compiled"],
+)

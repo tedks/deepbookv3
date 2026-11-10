@@ -1,0 +1,45 @@
+module(name = "deepbookv3")
+
+bazel_dep(name = "aspect_rules_js", version = "2.9.2")
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
+bazel_dep(name = "aspect_rules_ts", version = "3.5.2")
+bazel_dep(name = "aspect_tools_telemetry", version = "0.3.3")
+bazel_dep(name = "rules_nodejs", version = "6.7.5")
+
+single_version_override(
+    module_name = "aspect_tools_telemetry",
+    patch_strip = 1,
+    patches = ["//:build_defs/patches/telemetry-disabled.patch"],
+    version = "0.3.3",
+)
+
+telemetry = use_extension("@aspect_tools_telemetry//:extension.bzl", "telemetry")
+use_repo(telemetry, "aspect_tools_telemetry_report")
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(
+    node_repositories = {
+        "24.22.2-linux_amd64": [
+            "node-v24.22.2-linux-x64.tar.xz",
+            "node-v24.22.2-linux-x64",
+            "48cc0e21e048790e54c0cf5749c2725005313d652651c40b7a21feb9697aaf75",
+        ],
+    },
+    node_version = "24.22.2",
+)
+
+typescript = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext")
+typescript.deps(
+    ts_integrity = "sha512-NW8ByodCSNCwZeghjN3o+JX5OFH0Ojg6sadjEKY4huZ52TqbJTJnDo5+Tw98lSy63NZvi4n+ez5m2u5d4PkZyw==",
+    ts_version = "5.6.2",
+)
+use_repo(typescript, "npm_typescript")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "deepbook_scripts_npm",
+    lifecycle_hooks = {"*": []},
+    pnpm_lock = "//scripts:pnpm-lock.yaml",
+    use_home_npmrc = False,
+)
+use_repo(npm, "deepbook_scripts_npm")
